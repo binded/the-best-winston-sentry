@@ -1,6 +1,6 @@
 {
   "name": "the-best-winston-sentry",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Sentry transport for the winston logger.",
   "main": "src/index.js",
   "scripts": {
