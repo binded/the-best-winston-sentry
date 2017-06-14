@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/binded/the-best-winston-sentry.svg?branch=master)](https://travis-ci.org/binded/the-best-winston-sentry)
+
 # the-best-winston-sentry
 
 The best [winston logger](https://github.com/winstonjs/winston)
