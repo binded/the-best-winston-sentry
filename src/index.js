@@ -105,7 +105,8 @@ class SentryTransport extends winston.Transport {
       {
         extra: Object.assign({}, omit(meta, rootKeys), meta.extra),
       },
-      !meta.user && meta.req && meta.req.user ? { user: meta.req.user } : {},
+      /* eslint-disable comma-dangle */
+      !meta.user && meta.req && meta.req.user ? { user: meta.req.user } : {}
     )
 
     return { attrs, message: msg, err }
