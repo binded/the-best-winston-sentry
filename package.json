@@ -1,11 +1,12 @@
 {
   "name": "the-best-winston-sentry",
-  "version": "0.2.1",
+  "version": "0.0.1",
   "description": "Sentry transport for the winston logger.",
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint src/ test/",
     "test": "npm run lint && npm run test:fast",
+    "prepublish": "npm test",
     "test:fast": "tape test/**/*.js"
   },
   "repository": {
