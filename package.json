@@ -1,0 +1,38 @@
+{
+  "name": "the-best-winston-sentry",
+  "version": "0.2.1",
+  "description": "Sentry transport for the winston logger.",
+  "main": "src/index.js",
+  "scripts": {
+    "lint": "eslint src/ test/",
+    "test": "npm run lint && npm run test:fast",
+    "test:fast": "tape test/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guzru/winston-sentry.git"
+  },
+  "engines": {
+    "node": ">6"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "raven": "^1.1.4"
+  },
+  "keywords": [
+    "node",
+    "sentry",
+    "javascript",
+    "logger",
+    "winston"
+  ],
+  "author": "Olivier Lalonde <olalonde@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^4.0.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-import": "^2.3.0",
+    "tape": "^4.6.3",
+    "winston": "^2.3.1"
+  }
+}
