@@ -83,7 +83,10 @@ new Sentry({
 }
 ```
 
-When logging an error, there are three ways to pass metadata:
+### Reporting exceptions
+
+When logging an error, there are three ways to pass the error and
+metadata:
 
 - By assigning known properties directly to the error object
 
@@ -115,18 +118,15 @@ logger.error('oops!', {
 })
 ```
 
-### Reporting exceptions
-
-To report exceptions, use the `error` log level and pass
-the error object as the second argument, e.g.:
+When logging an error, the error's message will be concatenated with the
+message passed to the Winston logger, following the following format:
+`{msg} cause: {err.message}`, e.g.:
 
 ```javascript
 logger.error('Oops!', new Error('some error'))
 ```
 
-If the log message is not an empty, like in the example above, the
-reported error's message have the following format: `{msg} cause:
-{err.message}`, e.g.:
+will show the following error message in sentry:
 
 ```
 Oops! cause: some error
