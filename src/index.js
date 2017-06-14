@@ -12,6 +12,7 @@ const defaults = {
     debug: 'debug',
     warn: 'warning',
     error: 'error',
+    fatal: 'error',
   },
 }
 
