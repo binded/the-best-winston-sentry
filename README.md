@@ -31,7 +31,7 @@ const logger = new winston.Logger({
     new winston.transports.Console({level: 'silly'}),
     sentryTransport,
   ],
-});
+})
 
 // raven can be accessed from the transport object:
 sentryTransport.raven
@@ -69,6 +69,52 @@ new Sentry({
 })
 ```
 
+### Supported metadata
+
+```javascript
+{
+  user, // user object
+  req, // http request object
+  tags, // sentry tags, must be mapping of string -> string
+  extra, // sentry extra, can be arbitrary JSON
+  fingerprint, // used by sentry to group errors
+  // ...
+  // unknown props are merged with extra
+}
+```
+
+When logging an error, there are three ways to pass metadata:
+
+- By assigning known properties directly to the error object
+
+```javascript
+const err = new Error('some error')
+err.user = user
+err.req = req
+err.tags = { foo: 'bar' }
+logger.error('oops!', err)
+```
+
+- By passing the error as the message (this might break other
+    transports)
+
+```javascript
+const err = new Error('some error')
+logger.error(err, { user, req, tags: { foo: 'bar' } })
+```
+
+- **Recommended**: by passing the error as an `err` property on the metadata
+
+```javascript
+const err = new Error('some error')
+logger.error('oops!', {
+  err,
+  user,
+  req,
+  tags: { foo: 'bar' },
+})
+```
+
 ### Reporting exceptions
 
 To report exceptions, use the `error` log level and pass
@@ -85,3 +131,4 @@ reported error's message have the following format: `{msg} cause:
 ```
 Oops! cause: some error
 ```
+

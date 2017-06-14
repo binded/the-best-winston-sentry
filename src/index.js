@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 const winston = require('winston')
-
 const Raven = require('raven')
+const { omit, pick } = require('./utils')
 
 const defaults = {
   // Maps winston log levels to sentry log levels
@@ -62,43 +62,60 @@ class SentryTransport extends winston.Transport {
     Raven.on('error', handleRavenError)
   }
 
-  log(_level, msg, meta = {}, callback) {
-    const level = this.options.levelsMap[_level]
-
-    const extraData = Object.assign({}, meta)
-    const tags = extraData.tags
-    delete extraData.tags
-
-    const extra = {
-      level,
-      tags,
-      extra: extraData,
+  _parseArgs(winstonLevel, msg = '', meta = {}, err) {
+    if (meta instanceof Error) {
+      const e = meta
+      return this._parseArgs(winstonLevel, msg, {
+        user: e.user,
+        req: e.req,
+        tags: e.tags,
+        extra: e.extra,
+        fingerprint: e.fingerprint,
+      }, e)
+    }
+    if (meta.err instanceof Error) {
+      return this._parseArgs(winstonLevel, msg, omit(meta, ['err']), meta.err)
+    }
+    if (msg instanceof Error) {
+      return this._parseArgs(winstonLevel, '', meta, msg)
+    }
+    // logger.error('some message') -> convert to error to get
+    // stacktrace, etc.
+    if (winstonLevel === 'error' && !err) {
+      return this._parseArgs(winstonLevel, '', meta, new Error(msg))
     }
 
-    if (extraData.request) {
-      extra.request = extraData.request
-      delete extraData.request
+    if (err && msg) {
+      err.message = `${msg}. cause: ${err.message}`
     }
 
-    if (extraData.user) {
-      extra.user = extraData.user
-      delete extraData.user
-    }
+    // `extra` can contain arbitrary JSON data, while
+    // `tags` must be a string -> string mapping
 
-    // Support exceptions logging
-    if (level === 'error' && meta instanceof Error) {
-      if (msg) {
-        meta.message = `${msg}. cause: ${meta.message}`
-      }
-      Raven.captureException(meta, extra, (err) => {
-        callback(err, !err)
-      })
-      return
-    }
+    const level = this.options.levelsMap[winstonLevel]
+    const rootKeys = ['user', 'req', 'tags', 'extra', 'fingerprint']
+    const attrs = Object.assign(
+      {
+        level,
+      },
+      // known root keys
+      pick(meta, rootKeys),
+      // unknown keys go to extra prop
+      {
+        extra: Object.assign({}, omit(meta, rootKeys), meta.extra),
+      },
+      !meta.user && meta.req && meta.req.user ? { user: meta.req.user } : {},
+    )
 
-    Raven.captureMessage(msg, extra, (err) => {
-      callback(err, !err)
-    })
+    return { attrs, message: msg, err }
+  }
+
+  log(level, msg, meta = {}, callback) {
+    const { attrs, err, message } = this._parseArgs(level, msg, meta)
+    if (err) {
+      return Raven.captureException(err, attrs, callback)
+    }
+    Raven.captureMessage(message, attrs, callback)
   }
 }
 
