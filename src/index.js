@@ -115,7 +115,11 @@ class SentryTransport extends winston.Transport {
   log(level, msg, meta = {}, callback) {
     const { attrs, err, message } = this._parseArgs(level, msg, meta)
     if (err) {
-      return Raven.captureException(err, attrs, callback)
+      return Raven.captureException(err, attrs, (ravenErr, sentryId) => {
+        if (ravenErr) return callback(ravenErr)
+        err.sentryId = sentryId
+        return callback()
+      })
     }
     Raven.captureMessage(message, attrs, callback)
   }

@@ -41,3 +41,12 @@ test('log error with custom message', (t) => {
     t.error(err)
   })
 })
+
+test('err.sentryId is set', (t) => {
+  t.plan(2)
+  const testErr = new Error('some test error')
+  logger.error('custom message', testErr, (err) => {
+    t.error(err)
+    t.ok(testErr.sentryId.match(/[a-z0-9]{6}/))
+  })
+})

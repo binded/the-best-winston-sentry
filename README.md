@@ -132,3 +132,12 @@ will show the following error message in sentry:
 Oops! cause: some error
 ```
 
+The sentry event ID is added as a `sentryId` on the error object:
+
+```javascript
+const testErr = new Error('some error')
+logger.error('Oops!', testErr, () => {
+  console.log(testErr.sentryId)
+  // => 21479ebd4eec4afaaf9426617196a10a
+})
+```
